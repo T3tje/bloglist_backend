@@ -1,7 +1,6 @@
-const { TestWatcher } = require("jest")
 const listHelper = require('../utils/list_helper')
 
-const blogs = [
+const biggerBlogList = [
     {
       _id: "5a422a851b54a676234d17f7",
       title: "React patterns",
@@ -52,13 +51,78 @@ const blogs = [
     }  
   ]
   
- 
+  const listWithOneBlog = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 5,
+      __v: 0
+    }
+  ]
 
 describe('total likes', () => {
-      test('there should be 36 total likes', (blogs) => {
-      const result = listHelper.totalLikes(blogs)
-      console.log(blogs);
+
+      test('of a bigger list is calculated right', () => {
+      const result = listHelper.totalLikes(biggerBlogList)
       expect(result).toBe(36)
+      })
+
+      test('of an empty list is zero', () => {
+        const result = listHelper.totalLikes([])
+        expect(result).toBe(0)
+      })
+
+      test('when a test has only one blog, the number of likes is equal to that one', () => {
+        const result = listHelper.totalLikes(listWithOneBlog)
+        expect(result).toBe(5)
       })
   })
 
+describe('dummy test', () => {
+  test('dummy returns one', () => {
+    const blogs = []
+  
+    const result = listHelper.dummy(blogs)
+    expect(result).toBe(1)
+  })
+})
+
+describe('favorite blog', () => {
+  test('the function returns the most liked blog', () => {
+    const sampleBlog = {
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      likes: 12
+    }
+    const result = listHelper.favoriteBlog(biggerBlogList)
+    expect(result).toEqual(sampleBlog)
+  })
+})
+
+describe('author of most blogs', () => {
+  test('author of most blogs will be returned', () => {
+
+    const testObject = {
+        author: "Robert C. Martin",
+        blogs: 3
+    }
+    
+    const result = listHelper.mostBlogs(biggerBlogList)
+    expect(result).toEqual(testObject)
+  })
+})
+
+describe('author with most likes', () => {
+  test('author with most likes will be returned', () => {
+
+    const testObject = {
+      author: "Edsger W. Dijkstra",
+      likes: 17
+    }
+
+    const result = listHelper.mostLikes(biggerBlogList)
+    expect(result).toEqual(testObject)
+  })
+})

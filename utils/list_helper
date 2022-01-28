@@ -1,7 +1,6 @@
-const dummy = (blogs) => {
-    return 1
-}
+const _ = require('lodash');
 
+/*
 const blogs = [
     {
       _id: "5a422a851b54a676234d17f7",
@@ -27,8 +26,8 @@ const blogs = [
       likes: 12,
       __v: 0
     },
-    {
-      _id: "5a422b891b54a676234d17fa",
+      {
+        _id: "5a422b891b54a676234d17fa",
       title: "First class tests",
       author: "Robert C. Martin",
       url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
@@ -52,28 +51,86 @@ const blogs = [
       __v: 0
     }  
   ]
-
-const totalLikes = (blogs) => {
-    const sumTotal = blogs.map(item => item.likes).reduce((a, b) => a + b)
-    return sumTotal
+  */
+ 
+  const dummy = (blogs) => {
+    return 1
 }
 
-const favoriteBlog = (blogs) => {
-    const output = blogs.sort(function (a, b) {
-      return b.value - a.value;
+const totalLikes = (blogs) => {
+    if (blogs.length > 0) {
+      const sumTotal = blogs.map(item => item.likes).reduce((a, b) => a + b)
+      return sumTotal
+    }
+    return 0
+}
+
+const favoriteBlog = (list) => {
+    const output = list.sort(function (a, b) {
+      return b.likes - a.likes;
     });
+    
     const returnedObject = {
       title: output[0].title,
       author: output[0].author,
       likes: output[0].likes
     }
+    
+   
     return returnedObject
 }
 
-console.log(favoriteBlog(blogs));
-console.log(totalLikes(blogs));
+const mostBlogs = (blogs) => {
+
+  const authors = blogs.map(item => item.author)
+  const toCount = _.countBy(authors)
+
+  const currentAuthor = {
+    author: '',
+    blogs: 0
+  }
+  _.forEach(toCount, (value,key) => {
+    if (value > currentAuthor.blogs) {
+      currentAuthor.author = key
+      currentAuthor.blogs = value
+    }
+  })
+  return currentAuthor
+}
+
+const mostLikes = (blogs) => {
+  const authors = blogs.map(blog => blog.author)
+  const authorsSorted = _.uniq(authors)
+  const authorsObject = _.zipObject(authorsSorted)
+  
+  blogs.forEach(item => {
+    if (authorsObject[item.author]) {
+      authorsObject[item.author] += item.likes 
+    } else {
+    authorsObject[item.author] = item.likes
+    }
+  })
+
+  currentAuthor = {
+    author: '',
+    likes: 0
+  }
+
+  _.forEach(authorsObject, (value, key) => {
+    if (value > currentAuthor.likes) {
+      currentAuthor.author = key
+      currentAuthor.likes = value
+    }
+  })
+
+  return currentAuthor
+}
+
 
 module.exports = {
     dummy,
-    totalLikes
+    totalLikes,
+    favoriteBlog,
+    mostBlogs,
+    mostLikes
 }
