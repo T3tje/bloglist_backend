@@ -12,19 +12,82 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-test('blogs are returned as json and have the correct amount', async () => {
-  const arraySum = helper.initialBlogList.length
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-    
+describe('returned blogs as json', () => {
+  test('blogs are returned as json and have the correct amount', async () => {
+    const arraySum = helper.initialBlogList.length
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+      
+      const getRequest = await api.get('/api/blogs')
+      expect(getRequest.body.length).toBe(arraySum)
+
+  }, 150000)
+})
+
+describe('the unique identifier property', () => {
+ 
+  test('is \'id\'', async () => {
     const getRequest = await api.get('/api/blogs')
-    expect(getRequest.body.length).toBe(arraySum)
+    const BlogsWithId = getRequest.body.filter(item => item.id !== undefined)
+    expect(BlogsWithId.length).toBe(helper.initialBlogList.length)
+  })
 
-}, 150000)
+  test('is not \'_id\'', async () => {
+    const getRequest = await api.get('/api/blogs')
+    const BlogsWithUnderslId = getRequest.body.filter(item => item._id !== undefined)
+    expect(BlogsWithUnderslId.length).toBe(0)
+  })
+})
 
+describe('the post request is succesful', () => {
+  test('a valid blog can be added', async () => {
+    
+    const title = 'adding blogs is fun'
 
+    const newBlog = {
+      title: title,
+      author: 'my self',
+      url: 'www.www.ww',
+      likes: 1337
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(200)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogList.length + 1)
+    
+    const contentArray = blogsAtEnd.map(blog => blog.title)
+    expect(contentArray).toContain(title)
+   
+  })
+
+  test('value is set to 0, if its missing', async () => {
+
+    const newBlogWithoutLikes = {
+      title: 'adding blogs is fun',
+      author: 'my self',
+      url: 'www.www.ww'
+    }
+
+    const postResponse = await api.post('/api/blogs').send(newBlogWithoutLikes)
+    expect(postResponse.body.likes).toBe(0)
+  })
+
+  test('status code is 400, if url AND title is missing', async () => {
+    const newFailBlog = {
+      author: 'my self',
+      likes: 1337,
+    }
+    await api
+      .post('/api/blogs/')
+      .send(newFailBlog)
+      .expect(400)
+  })
+})
 
 afterAll( () => {
   mongoose.connection.close()

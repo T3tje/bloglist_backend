@@ -2,8 +2,7 @@ POST http://localhost:3003/api/blogs/
 Content-Type: application/json
 
 {
-    "title": "Juhu",
     "author": "T3tje",
-    "url": "www.natursatt.de",
-    "likes": 37000000
+    "likes": 37000000,
+    "title": "lalaLand"
 }
