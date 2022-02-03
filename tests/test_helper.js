@@ -51,6 +51,41 @@ const initialBlogList = [
   }  
 ]
 
+initialUserList = [
+    {
+      username: "mrm1ster",
+      name: "T3tje",
+      blogs: [ ],
+      _id: "61fbd50a38a41c1ff331bb37",
+      __v: 0,
+      passwordHash: "$2b$10$TivwNb0m5BXytudyJMDXe.WA4xx7qbuW763vIHHKfzrcl9oaPB1WO"
+    },
+    {
+      username: "misTa",
+      name: "T1ilman",
+      blogs: [ ],
+      _id: "61fbd53f38a41c1ff331bb3b",
+      __v: 0,
+      passwordHash: "$2b$10$TivwNb0m5BXytudyJMDXe.WA4xx7qbuW763vIHHKfzrcl9oaPB1W4"
+    },
+    {
+      username: "misTa2",
+      name: "T1ilman",
+      blogs: [ ],
+      _id: "61fbdb124087229f28ffea08",
+      __v: 0,
+      passwordHash: "$2b$10$TivwNb0m5BXytudyJMDXe.WA4xx7qbuW763vIHHKfzrcl9oaPB1W3"
+    },
+    {
+      username: "misTa3",
+      name: "T1ilman",
+      blogs: [ ],
+      _id: "61fbdbb639f223a456c94ecf",
+      __v: 0,
+      passwordHash: "$2b$10$TivwNb0m5BXytudyJMDXe.WA4xx7qbuW763vIHHKfzrcl9oaPB1W2"
+    }
+  ]
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
@@ -58,5 +93,6 @@ const blogsInDb = async () => {
 
 module.exports = {
     initialBlogList,
+    initialUserList,
     blogsInDb
 }
