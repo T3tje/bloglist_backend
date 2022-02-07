@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken")
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require("../models/users")
+const middleware = require("../utils/middleware")
 
 /*
 const getTokenFrom = request => {
@@ -18,17 +18,9 @@ blogRouter.get('/', async (request, response) => {
     response.json(blogs)
   })
   
-blogRouter.post('/', async (request, response) => {
+blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-   
-  if(!decodedToken.id) {
-    return response.status(401).json({
-      error: "token missing or invalid"
-    })
-  }
-
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   if(!body.title && !body.url) {
     response.status(400).json(
@@ -46,32 +38,26 @@ blogRouter.post('/', async (request, response) => {
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await User.findByIdAndUpdate(user._id, user, {new:true})
-    response.status(201)
+    response.status(200)
     response.json(savedBlog)
   }
 })
 
-blogRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+blogRouter.delete('/:id',middleware.userExtractor, async (request, response) => {
+  
   const blogId = request.params.id
-  if(!decodedToken.id) {
-    return response.status(401).json({
-      error: "token missing or invalid"
-    })
-  }
-
   const blog = await Blog.findById(blogId)
-  const user = await User.findById(decodedToken.id)
-
+  
+  const user = request.user
   const blogUserIndex = user.blogs.indexOf(blogId)
- 
+
   if (blog.user.toString() === user._id.toString()) {
     await Blog.findByIdAndRemove(blogId)
     
     //remove blogid from User
     if (blogUserIndex > -1) {
       
-      user.blogs = user.blogs.slice(blogUserIndex, blogUserIndex + 1)
+      user.blogs.splice(blogUserIndex, 1)
       await User.findByIdAndUpdate(user._id, user, {new:true})
     }
     response.status(204).end()

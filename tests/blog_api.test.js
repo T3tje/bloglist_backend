@@ -3,13 +3,20 @@ const supertest = require('supertest')
 const helper = require('./test_helper.js')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require("../models/users")
+const users = require('../models/users.js')
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  const noteObjects = helper.initialBlogList.map(item => new Blog(item))
-  const promiseArray = noteObjects.map(blog => blog.save())
+  const blogObjects = helper.initialBlogList.map(item => new Blog(item))
+  const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+  await users.deleteMany({})
+  const userObjects = helper.initialUserList.map(item => new User(item))
+  const promiseArray2 = userObjects.map(user => user.save())
+  await Promise.all(promiseArray2)
 })
 
 describe('returned blogs as json', () => {
@@ -54,6 +61,7 @@ describe('the post request is succesful', () => {
     }
     await api
       .post('/api/blogs')
+      .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pc1RhIiwiaWQiOiI2MWZlM2FkNTI3MzZjNDFmZDg5NDUxMTciLCJpYXQiOjE2NDQyMTg1ODh9.YET2x8CAsHs1IAXrOyItkAdCRnYaiw4n55AwFo0IgrY")
       .send(newBlog)
       .expect(200)
 
@@ -73,7 +81,11 @@ describe('the post request is succesful', () => {
       url: 'www.www.ww'
     }
 
-    const postResponse = await api.post('/api/blogs').send(newBlogWithoutLikes)
+    const postResponse = await api
+      .post('/api/blogs')
+      .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pc1RhIiwiaWQiOiI2MWZlM2FkNTI3MzZjNDFmZDg5NDUxMTciLCJpYXQiOjE2NDQyMTg1ODh9.YET2x8CAsHs1IAXrOyItkAdCRnYaiw4n55AwFo0IgrY")
+      .send(newBlogWithoutLikes)
+      
     expect(postResponse.body.likes).toBe(0)
   })
 
@@ -84,8 +96,17 @@ describe('the post request is succesful', () => {
     }
     await api
       .post('/api/blogs/')
+      .set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pc1RhIiwiaWQiOiI2MWZlM2FkNTI3MzZjNDFmZDg5NDUxMTciLCJpYXQiOjE2NDQyMTg1ODh9.YET2x8CAsHs1IAXrOyItkAdCRnYaiw4n55AwFo0IgrY")
       .send(newFailBlog)
       .expect(400)
+  })
+})
+
+describe("failed authentication", () => {
+  test("status 401 if a token is not provided", async () => {
+    await api
+      .post('/api/blogs/')
+      .expect(401)
   })
 })
 
